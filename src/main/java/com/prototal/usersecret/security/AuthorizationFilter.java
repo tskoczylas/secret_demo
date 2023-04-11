@@ -72,9 +72,10 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(username, decodedJWT.getId(), null);
 
             if (!tokenRepository.findByTokenId(decodedJWT.getId()).isPresent()) {
-                throw new IllegalAccessException("Try to authorize Token that is not in DB");
+                log.warn("User --- {} ---.Try to authorize Token that is not in DB.", decodedJWT.getSubject());
+                response.sendError(401, "Authorization failed");
+                return;
             }
-
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             filterChain.doFilter(request, response);
